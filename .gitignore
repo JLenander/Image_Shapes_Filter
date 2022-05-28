@@ -1,0 +1,5 @@
+example_imgs/
+plan.md
+.pytest_cache
+.vscode
+__pycache__
