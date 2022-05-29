@@ -1,4 +1,4 @@
-"""Color Difference Map Tools"""
+"""Color Tools, including color difference map and average color"""
 
 from PIL.Image import Image
 from PIL import ImageChops
