@@ -1,7 +1,8 @@
 """Color Tools, including color difference map and average color"""
 
 from PIL.Image import Image
-from PIL import ImageChops
+from PIL import ImageChops, ImageStat
+from typing import Optional
 
 
 def color_difference_image(img1: Image, img2: Image) -> Image:
@@ -42,3 +43,25 @@ def color_difference_max_score(img: Image) -> int:
     The maximum score is 255 difference * 3 color channels * x number of pixels
     """
     return 765 * img.width * img.height
+
+
+def average_color(img: Image, mask: Optional[Image] = None) -> tuple[int]:
+    """Return the average color of <img> within the optional <mask> or for the entire image.
+
+    Average color is returned as an rgb tuple of integers.
+
+    <img> should be in RGB mode
+    <mask> should be a valid pillow mask (namely same dimensions as <img> and in mode 1 or L)
+    """
+    return _average_color_image_stats(img, mask)
+
+
+def _average_color_image_stats(img: Image, mask: Optional[Image]) -> tuple[int]:
+    """Return the average color of <img> within the optional <mask> or for the entire image.
+
+    Pillow ImageStat implementation of average color.
+    <img> should be in RGB mode
+    <mask> should be a valid pillow mask (namely same dimensions as <img> and in mode 1 or L)
+    """
+    r, g, b = ImageStat.Stat(img, mask).mean
+    return (int(r), int(g), int(b))
