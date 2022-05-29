@@ -1,10 +1,10 @@
 """Color Difference Map Tools"""
 
-from PIL import Image
+from PIL.Image import Image
 from PIL import ImageChops
 
 
-def color_difference_image(img1: Image.Image, img2: Image.Image) -> Image.Image:
+def color_difference_image(img1: Image, img2: Image) -> Image:
     """Return a new Image object created by taking the
     absolute value distance between <img1> and <img2>.
 
@@ -21,7 +21,7 @@ def color_difference_image(img1: Image.Image, img2: Image.Image) -> Image.Image:
     return ImageChops.difference(img1, img2)
 
 
-def color_difference_score(img1: Image.Image, img2: Image.Image) -> int:
+def color_difference_score(img1: Image, img2: Image) -> int:
     """Return an integer representing how close <img1> is to <img2>.
 
     <img1> and <img2> should be the same dimensions and should be in RGB mode.
@@ -35,7 +35,7 @@ def color_difference_score(img1: Image.Image, img2: Image.Image) -> int:
     return sum(histo[i] * (i % 256) for i in range(768))
 
 
-def color_difference_max_score(img: Image.Image) -> int:
+def color_difference_max_score(img: Image) -> int:
     """Returns the maximum (worst) score for color difference between img and
     another image of the same dimensions.
 
