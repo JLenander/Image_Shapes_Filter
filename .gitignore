@@ -3,3 +3,4 @@ plan.md
 .pytest_cache
 .vscode
 __pycache__
+.hypothesis
