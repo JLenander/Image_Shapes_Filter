@@ -130,7 +130,7 @@ class random_shape_selector(shape_selector):
                 # Use mask to determine average color of the region in the target
                 mask = Image.new('1', target.size)
                 mask_draw = ImageDraw.Draw(mask)
-                mask_draw.ellipse(xy, 1)
+                mask_draw.rectangle(xy, 1)
                 fill = average_color(target, mask)
             case _:
                 raise RuntimeError(f'Random shape {shape} is not handled by match statement')
