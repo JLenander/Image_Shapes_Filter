@@ -1,5 +1,9 @@
 """Objects for selection of shape to use in filter.
-Handles evolution of shapes.
+
+Each shape selector object handles random selection of shape(s)
+Each shape selector class also has a static method that handles drawing of shapes.
+
+Shapes are denoted by a string format defined by the class
 """
 
 from PIL import ImageDraw, Image
@@ -28,7 +32,7 @@ class shape_selector():
 
 
 class random_shape_selector(shape_selector):
-    """Shape Selector randomly selecting from available shapes using the pillow draw library
+    """Shape Selector randomly selecting from available shapes using the pillow/PIL draw library
 
     Shapes:
         - ellipse (including circle)
