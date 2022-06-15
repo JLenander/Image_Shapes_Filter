@@ -63,5 +63,8 @@ def _average_color_image_stats(img: Image, mask: Optional[Image]) -> tuple[int]:
     <img> should be in RGB mode
     <mask> should be a valid pillow mask (namely same dimensions as <img> and in mode 1 or L)
     """
-    r, g, b = ImageStat.Stat(img, mask).mean
-    return (int(r), int(g), int(b))
+    try:
+        r, g, b = ImageStat.Stat(img, mask).mean
+        return (int(r), int(g), int(b))
+    except ZeroDivisionError:
+        raise ValueError('The mask covers the whole image so no average color can be calculated')
