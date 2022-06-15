@@ -7,7 +7,7 @@ Shapes are denoted by a string format defined by the class
 """
 
 from PIL import ImageDraw, Image
-from program.color_utils import average_color
+from color_utils import average_color
 import random
 
 
