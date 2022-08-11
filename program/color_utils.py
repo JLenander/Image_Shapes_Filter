@@ -45,6 +45,23 @@ def color_difference_max_score(img: Image) -> int:
     return 765 * img.width * img.height
 
 
+def color_difference_score_normalized(img1: Image, img2: Image) -> float:
+    """Return a float representing how close <img1> is to <img2>.
+
+    <img1> and <img2> should be the same dimensions and should be in RGB mode.
+
+    The best and minimum score is 0.0, representing that all of the pixels
+    between the two images are the same.
+
+    The worst and maximum score is 1.0, representing the maximum difference
+    between the two images
+
+    This score is a version of color_utils.color_difference_score normalized to
+    the range [0,1].
+    """
+    return color_difference_score(img1, img2) / color_difference_max_score(img1)
+
+
 def average_color(img: Image, mask: Optional[Image] = None) -> tuple[int]:
     """Return the average color of <img> within the optional <mask> or for the entire image.
 
