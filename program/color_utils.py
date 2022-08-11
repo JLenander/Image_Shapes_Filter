@@ -30,7 +30,7 @@ def color_difference_score(img1: Image, img2: Image) -> int:
     The best and minimum score is 0, representing that all pixels are the same between
     the two images.
 
-    The worst and maximum score can be found from color_difference.color_difference_max_score
+    The worst and maximum score can be found from color_utils.color_difference_max_score
     """
     histo = ImageChops.difference(img1, img2).histogram()
     return sum(histo[i] * (i % 256) for i in range(768))
