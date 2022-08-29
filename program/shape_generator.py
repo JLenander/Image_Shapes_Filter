@@ -140,17 +140,17 @@ class random_shape_selector(shape_selector):
         p2x = -1
         if random.random() > 0.5:
             # Second point is to the left of the first point
-            p2x = random.randrange(max(x0, p1x - self.max_size), p1x - self.min_size)
+            p2x = random.randint(max(x0, p1x - self.max_size), p1x - self.min_size)
         else:
             # Second point is to the right of the first point
-            p2x = random.randrange(p1x + self.min_size, min(x1, p1x + self.max_size))
+            p2x = random.randint(p1x + self.min_size, min(x1, p1x + self.max_size))
 
         p2y = -1
         if random.random() > 0.5:
             # Second point is below the first point
-            p2y = random.randrange(max(y0, p1y - self.max_size), p1y - self.min_size)
+            p2y = random.randint(max(y0, p1y - self.max_size), p1y - self.min_size)
         else:
-            p2y = random.randrange(p1y + self.min_size, min(y1, p1y + self.max_size))
+            p2y = random.randint(p1y + self.min_size, min(y1, p1y + self.max_size))
 
         # The first point in xy is the topleft point of the shape's bbox
         # The second point in xy is the bottomright point of the shape's bbox
