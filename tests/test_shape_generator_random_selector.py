@@ -60,3 +60,25 @@ def test_random_selector_draw(p1, p2):
     base = Image.new('RGB', (1000, 1000), base_color)
     shape_generator.random_shape_selector.draw_shape(base, shape)
     assert expected == base
+
+
+@given(tuples(integers(min_value=-50, max_value=99), integers(min_value=-50, max_value=99)),
+       tuples(integers(min_value=1, max_value=150), integers(min_value=1, max_value=150)))
+def test_random_selector_shape_evolution_on_canvas(p1, p2):
+    """Tests whether the evolution of shapes keeps at least 1px of the shape within the canvas"""
+    # Assume p1 is the topleft point and p2 is the bottomright point with a 2px difference
+    assume(p1[0] < p2[0])
+    assume(p1[1] < p2[1])
+
+    blank_target = Image.new('RGB', (100, 100), (255, 255, 255))
+
+    selector = shape_generator.random_shape_selector([(-50, -50), (150, 150)], 30, 50)
+    random_PIL_shape = selector.get_shape_tuple()
+    original_shape = random_PIL_shape('rectangle', [p1, p2], (0, 0, 0))
+    new_shape = selector.evolve_shape(blank_target, original_shape)
+    mask = Image.new('1', (100, 100))
+    mask_draw = ImageDraw.Draw(mask)
+    mask_draw.rectangle(new_shape.xy, 1)
+
+    # Assert there is at least 1 px of the image that the evolved rectangle covers
+    assert mask.getextrema() != (0, 0)

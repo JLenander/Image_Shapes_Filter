@@ -1,6 +1,7 @@
 """Objects for selection of shape to use in filter.
 
-Each shape selector object handles random selection of shape(s)
+Each shape selector object handles random selection of shape(s) and random evolution
+of shapes.
 Each shape selector class also has a static method that handles drawing of shapes.
 
 Shapes are denoted by a namedtuple defined by the class
@@ -156,31 +157,11 @@ class random_shape_selector(shape_selector):
         # The second point in xy is the bottomright point of the shape's bbox
         xy = [(min(p1x, p2x), min(p1y, p2y)), (max(p1x, p2x), max(p1y, p2y))]
 
-        fill = ()
         shape_name = random.choice(shapes)
-        match shape_name:
-            case 'ellipse':
-                # Use mask to determine average color of the region in the target
-                mask = Image.new('1', target.size)
-                mask_draw = ImageDraw.Draw(mask)
-                mask_draw.ellipse(xy, 1)
-
-                # Ellipse drawn with bbox may not have shape within image.
-                # In this case, the ellipse becomes a rectangle to ensure
-                # the shape is within the image.
-                if mask.getextrema() == (0, 0):
-                    shape_name = 'rectangle'
-                    mask_draw.rectangle(xy, 1)
-
-                fill = average_color(target, mask)
-            case 'rectangle':
-                # Use mask to determine average color of the region in the target
-                mask = Image.new('1', target.size)
-                mask_draw = ImageDraw.Draw(mask)
-                mask_draw.rectangle(xy, 1)
-                fill = average_color(target, mask)
-            case _:
-                raise RuntimeError(f'Random shape {shape_name} is not handled by match statement')
+        fill = self._get_average_color(target, shape_name, xy)
+        if fill is False:  # Ellipse is not within image boundaries
+            shape_name = 'rectangle'
+            fill = self._get_average_color(target, shape_name, xy)
 
         return self.shape_tuple(shape=shape_name, xy=xy, color=fill)
 
@@ -189,6 +170,87 @@ class random_shape_selector(shape_selector):
         The shape namedtuple is defined in random_shape_selector.get_shape_tuple
         """
         return [self.random_shape(target) for _ in range(n)]
+
+    def evolve_shape(self, target: Image.Image, shape: tuple) -> tuple:
+        """Return a new shape described by a namedtuple. The new shape is based on the random shape
+        tuple <shape> with slight variations in its properties (new shape is guaranteed to be within
+        the image boundaries)
+
+        The evolved shape will have its color value recalculated to the average color of the shape
+        mask in the target image.
+
+        Property Variability:
+            - X Position (up to +/- 5% of the image width in difference)
+                Note: If the change in position hits the bounding box, this will squish the shape
+            - Y Position (up to +/- 5% of the image height in difference)
+                Note: If the change in position hits the bounding box, this will squish the shape
+            - Scale      (up to +/- 20% scale)
+                Note: scale is limited by self.max_size and self.min_size
+                Note: shapes scale from their centerpoint (equally in each direction)
+        """
+        bx0, by0, bx1, by1 = self.bbox
+        shape_name = shape.shape
+        x0, y0 = shape.xy[0]
+        x1, y1 = shape.xy[1]
+
+        shape_width = x1 - x0
+        shape_height = y1 - y0
+
+        # Property variations
+        x_variation_bound = int(target.width * 0.05)
+        x_var = random.randint(-x_variation_bound, x_variation_bound)
+
+        y_variation_bound = int(target.height * 0.05)
+        y_var = random.randint(-y_variation_bound, y_variation_bound)
+
+        # Scale divided by two so that shape scales from centerpoint
+        scale_variation_bound = min(min((self.max_size - shape_width) / shape_width, 0.2),
+                                    min((self.max_size - shape_height) / shape_height, 0.2))
+        scale_var_percent = random.uniform(-scale_variation_bound, scale_variation_bound)
+        scale_x_var = int((shape_width * scale_var_percent) / 2)
+        scale_y_var = int((shape_height * scale_var_percent) / 2)
+
+        # Inner max/min guarantees point stays within bounding box
+        # Outer max/min guarantees point has a minimum of 1 px in the image boundaries
+        #   ^ Achieves this by preventing topleft point from passing bottom or right side of image
+        #   and by preventing bottomright point from passing top or left side of image.
+        new_xy = [(min(max(bx0, x0 + x_var - scale_x_var), target.width - 1),
+                   min(max(by0, y0 + y_var - scale_y_var), target.height - 1)),
+                  (max(min(bx1, x1 + x_var + scale_x_var), 0),
+                   max(min(by1, y1 + y_var + scale_y_var), 0))]
+
+        new_color = self._get_average_color(target, shape_name, new_xy)
+        if new_color is False:  # Ellipse is not within image boundaries
+            shape_name = 'rectangle'
+            new_color = self._get_average_color(target, shape_name, new_xy)
+
+        return self.shape_tuple(shape=shape_name, xy=new_xy, color=new_color)
+
+    def _get_average_color(self, target: Image.Image, shape_name: str, xy: list) -> tuple | bool:
+        """Helper method to get the average color of the area defined by
+        the shape's mask over the <target> image.
+
+        If the method returns false, that means the ellipse does not have any pixels within the
+        image boundaries. In this case, the ellipse should become a rectangle.
+        """
+        # Use mask to determine average color of the region in the target
+        mask = Image.new('1', target.size)
+        mask_draw = ImageDraw.Draw(mask)
+        match shape_name:
+            case 'ellipse':
+                mask_draw.ellipse(xy, 1)
+
+                # Ellipse drawn with bbox may not have shape within image.
+                # In this case, return False and the ellipse should become a rectangle.
+                if mask.getextrema() == (0, 0):
+                    return False
+
+                return average_color(target, mask)
+            case 'rectangle':
+                mask_draw.rectangle(xy, 1)
+                return average_color(target, mask)
+            case _:
+                raise RuntimeError(f'Random shape {shape_name} is not handled by match statement')
 
     @staticmethod
     def draw_shape(img: Image.Image, shape: tuple) -> None:
