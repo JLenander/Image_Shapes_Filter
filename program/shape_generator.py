@@ -40,11 +40,6 @@ class shape_selector():
         raise NotImplementedError()
 
     @staticmethod
-    def get_shape_tuple() -> Type[tuple]:
-        """Return this classes namedtuple instance used for describing shapes"""
-        raise NotImplementedError()
-
-    @staticmethod
     def shape_tuple_to_str(shape: tuple) -> str:
         """Return the string representation of the shape <shape>"""
         raise NotImplementedError()
@@ -66,10 +61,14 @@ class random_shape_selector(shape_selector):
         - diameter/width/height/length
         - location
     """
+    """ Instance Attributes """
     bbox: list[int]  # list of points in the form [x0, y0, x1, y1]
     min_size: int  # Minimum diameter/dimensions of shape in pixels
     max_size: int  # Maximum diameter/dimensions of shape in pixels
-    shape_tuple: Type[tuple]  # namedtuple class for this selector's shape tuples
+
+    """ Static Attributes """
+    # namedtuple class for this selector's shape tuples
+    shape_tuple = namedtuple('random_PIL_shape', ['shape', 'xy', 'color'])
 
     def __init__(self, bbox: list[tuple[int]] | list[int], min_size: int, max_size: int) -> None:
         """Initialize a new random_shape_selector object
@@ -114,7 +113,6 @@ class random_shape_selector(shape_selector):
             raise ValueError('min_size must be containable in the bounding box')
         self.min_size = min_size
         self.max_size = max_size
-        self.shape_tuple = random_shape_selector.get_shape_tuple()
 
     def random_shape(self, target: Image.Image) -> tuple:
         """Return a new random shape represented by a namedtuple using <target> as reference.
@@ -126,7 +124,7 @@ class random_shape_selector(shape_selector):
         the ellipse becomes a rectangle defined by the bounding box of the ellipse. This behavior
         is rare when self.bbox is reasonably set (within 150% of the image dimensions)
 
-        The shape namedtuple is defined in random_shape_selector.get_shape_tuple
+        The shape namedtuple is defined as random_shape_selector.shape_tuple
         """
         shapes = ['ellipse', 'rectangle']
         x0, y0, x1, y1 = self.bbox
@@ -167,7 +165,7 @@ class random_shape_selector(shape_selector):
 
     def random_shapes(self, target: Image.Image, n: int) -> list[tuple]:
         """Return a list of <n> new random shape tuples using <target> as reference
-        The shape namedtuple is defined in random_shape_selector.get_shape_tuple
+        The shape namedtuple is defined as random_shape_selector.shape_tuple
         """
         return [self.random_shape(target) for _ in range(n)]
 

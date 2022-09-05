@@ -15,7 +15,7 @@ def blank_target():
 def test_random_shape_tuple_fields(blank_target):
     bbox = [(-100, -100), (blank_target.width + 100, blank_target.height + 100)]
     selector = shape_generator.random_shape_selector(bbox, 1, 1000)
-    random_PIL_shape = selector.get_shape_tuple()
+    random_PIL_shape = selector.shape_tuple
     assert random_PIL_shape._fields == ('shape', 'xy', 'color')
 
 
@@ -52,7 +52,7 @@ def test_random_selector_draw(p1, p2):
 
     base_color = (255, 255, 255)
     draw_color = (0, 0, 0)
-    random_PIL_shape = shape_generator.random_shape_selector.get_shape_tuple()
+    random_PIL_shape = shape_generator.random_shape_selector.shape_tuple
     expected = Image.new('RGB', (1000, 1000), base_color)
     expected_draw = ImageDraw.Draw(expected)
     expected_draw.rectangle([p1, p2], draw_color)
@@ -73,7 +73,7 @@ def test_random_selector_shape_evolution_on_canvas(p1, p2):
     blank_target = Image.new('RGB', (100, 100), (255, 255, 255))
 
     selector = shape_generator.random_shape_selector([(-50, -50), (150, 150)], 30, 50)
-    random_PIL_shape = selector.get_shape_tuple()
+    random_PIL_shape = selector.shape_tuple
     original_shape = random_PIL_shape('rectangle', [p1, p2], (0, 0, 0))
     new_shape = selector.evolve_shape(blank_target, original_shape)
     mask = Image.new('1', (100, 100))
