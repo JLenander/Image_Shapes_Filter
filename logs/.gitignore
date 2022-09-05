@@ -1,0 +1,4 @@
+# No logs are tracked
+*
+# This file is tracked
+!.gitignore

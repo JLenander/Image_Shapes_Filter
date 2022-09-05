@@ -1,8 +1,10 @@
 """Color Tools, including color difference map and average color"""
 
-from PIL.Image import Image
-from PIL import ImageChops, ImageStat
+import logging
 from typing import Optional
+
+from PIL import ImageChops, ImageStat
+from PIL.Image import Image
 
 
 def color_difference_image(img1: Image, img2: Image) -> Image:
@@ -17,6 +19,8 @@ def color_difference_image(img1: Image, img2: Image) -> Image:
     Intended to be used for visual purposes, not optimized.
     """
     if img1.mode != 'RGB' or img2.mode != 'RGB':
+        logging.info(f'Images {id(img1)=} or {id(img2)=} are not in RGB mode,'
+                     'converting them to RGB for color_difference_image method.')
         return ImageChops.difference(img1.convert('RGB'), img2.convert('RGB'))
 
     return ImageChops.difference(img1, img2)
@@ -84,4 +88,6 @@ def _average_color_image_stats(img: Image, mask: Optional[Image]) -> tuple[int]:
         r, g, b = ImageStat.Stat(img, mask).mean
         return (int(r), int(g), int(b))
     except ZeroDivisionError:
+        logging.error(f'Image mask covers whole image for img {id(img)=}'
+                      f' so no average color can be calculated {mask=}')
         raise ValueError('The mask covers the whole image so no average color can be calculated')
