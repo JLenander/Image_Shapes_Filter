@@ -1,4 +1,7 @@
-example_imgs/
+example_imgs/*
+!example_imgs/ProfilePic.png
+!example_imgs/ProfilePicBruteForceTiny.png
+!example_imgs/ProfilePicExampleBruteForce.png
 plan.md
 .pytest_cache
 .vscode
