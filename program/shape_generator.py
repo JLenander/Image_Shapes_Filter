@@ -31,7 +31,7 @@ class shape_selector():
         """Return a list of <n> new random shape tuples using <target> as reference"""
         raise NotImplementedError()
 
-    def evolve_shape(self, shape: tuple) -> str:
+    def evolve_shape(self, target: Image.Image, shape: tuple) -> str:
         """Return a new shape described by a tuple. The new shape is based on <shape> with
         slight variations in its properties.
         """

@@ -155,7 +155,7 @@ class approximation_filter:
         for i in range(self.num_iterations):
             ranked_n_shapes = self._rank_shapes(target, canvas, n_shapes)
             try:
-                n_shapes = self._run_iteration(ranked_n_shapes)
+                n_shapes = self._run_iteration(target, ranked_n_shapes, shape_selector)
             except Exception as e:
                 logging.error(f'Failed to complete iteration on iteration {i}')
                 logging.exception(e)
@@ -163,7 +163,8 @@ class approximation_filter:
         # Shape at index 0 is the top shape.
         return n_shapes[0]
 
-    def _run_iteration(self, shapes: list[tuple]) -> list[tuple]:
+    def _run_iteration(self, target: Image, shapes: list[tuple],
+                       shape_selector: shape_generator.shape_selector) -> list[tuple]:
         """Return a new list of <self.num_shapes> shapes that are evolved variants of
         <self.num_top_shapes> top ranked shapes from the list <shapes>.
 
@@ -176,7 +177,7 @@ class approximation_filter:
         shape_num = 0
         while (shape_num < self.num_shapes):
             shape_to_evolve = shapes_to_evolve[shape_num % len(shapes_to_evolve)]
-            new_shapes.append(self.shape_selector_class.evolve_shape(shape_to_evolve))
+            new_shapes.append(shape_selector.evolve_shape(target, shape_to_evolve))
             shape_num += 1
         logging.debug(f'Evolved {shape_num} shapes from {len(shapes_to_evolve)} top shapes')
         return new_shapes
@@ -211,8 +212,8 @@ def main():
     # Program Start
     try:
         filter = approximation_filter(shape_generator.random_shape_selector)
-        # target = Img.open('./example_imgs/ProfilePic.png').convert('RGB')
-        target = Img.open('../example_imgs/gearMid.png').convert('RGB')
+        # target = Img.open('../example_imgs/ProfilePic.png').convert('RGB')
+        target = Img.open('../example_imgs/hat_no_transparency.png').convert('RGB')
         filter.run_filter_with_viewer(target)
     except Exception as e:
         logging.exception(e)
