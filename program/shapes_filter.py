@@ -115,6 +115,8 @@ class approximation_filter:
             if i % show_steps == 0:
                 viewer.show(canvas)
 
+            logging.info(f"Round {i} finished with similarity score {similarity(target, canvas)}")
+
             i += 1
 
         if i == self.max_rounds:
@@ -148,6 +150,7 @@ class approximation_filter:
         Before passing the shapes to the iteration method,
         the shapes are ranked using <self._rank_shapes>
         """
+        logging.debug("Running new round")
         shape_selector = self._init_shape_selector(target, canvas)
 
         n_shapes = shape_selector.random_shapes(target, self.num_shapes)
@@ -161,6 +164,7 @@ class approximation_filter:
                 logging.exception(e)
 
         # Shape at index 0 is the top shape.
+        logging.debug(f"Best shape is {n_shapes[0]}")
         return n_shapes[0]
 
     def _run_iteration(self, target: Image, shapes: list[tuple],
