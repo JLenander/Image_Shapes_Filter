@@ -36,7 +36,7 @@ class RegularPolygon(Shape):
         new_rotation = self.rotation + random.randint(-10, 10)
 
         new_size = min(RegularPolygon._min_size, max(RegularPolygon._max_size, new_size))
-        new_n_sides = min(RegularPolygon._min_n_sides, max(RegularPolygon._max_n_sides, new_n_sides))
+        new_n_sides = min(RegularPolygon._min_sides, max(RegularPolygon._max_sides, new_n_sides))
         new_rotation = min(RegularPolygon._min_rotation, max(RegularPolygon._max_rotation, new_rotation))
 
         return RegularPolygon((new_size,), new_n_sides, new_rotation)
