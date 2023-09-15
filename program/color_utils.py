@@ -3,8 +3,11 @@
 import logging
 from typing import Optional
 
-from PIL import ImageChops, ImageStat
+from PIL import ImageChops, ImageStat, ImageDraw
 from PIL.Image import Image
+from PIL.Image import new as NewImg
+
+from shapes.shape import Shape
 
 
 def color_difference_image(img1: Image, img2: Image) -> Image:
@@ -66,14 +69,28 @@ def color_difference_score_normalized(img1: Image, img2: Image) -> float:
     return color_difference_score(img1, img2) / color_difference_max_score(img1)
 
 
-def average_color(img: Image, mask: Optional[Image] = None) -> tuple[int]:
-    """Return the average color of <img> within the optional <mask> or for the entire image.
+def average_color_img(img: Image) -> tuple[int]:
+    """Return the average color of <img> for the entire image.
 
     Average color is returned as an rgb tuple of integers.
 
     <img> should be in RGB mode
-    <mask> should be a valid pillow mask (namely same dimensions as <img> and in mode 1 or L)
     """
+    return _average_color_image_stats(img, None)
+
+
+def average_color_shape(img: Image, shape: Shape, position: tuple[int]) -> tuple[int]:
+    """Return the average color of <img> within the bounds of the <shape>.
+
+    Average color is returned as an rgb tuple of integers.
+
+    <img> should be in RGB mode
+    <shape> should be a valid shape
+    <position> should be a tuple representing the position of the shape as interpreted by the shape
+    """
+    mask = NewImg('1', img.size)
+    mask_draw = ImageDraw.Draw(mask)
+    shape.draw_shape(mask_draw, shape, position, 1)
     return _average_color_image_stats(img, mask)
 
 
