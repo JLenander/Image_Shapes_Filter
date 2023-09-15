@@ -2,11 +2,11 @@ import logging
 import random
 
 from PIL import ImageDraw
-from shape import Shape
+from shapes.shape import Shape
 
 
 class RegularPolygon(Shape):
-    """A Regular Polygon
+    """A Regular Polygon*
 
     A Regular Polygon's size attribute is a tuple of a single integer representing the length from
     the midpoint of the polygon to a vertex of the polygon.
@@ -31,7 +31,7 @@ class RegularPolygon(Shape):
 
     def evolve_shape(self) -> Shape:
         """Return a new Shape based on this shape with slight variations in it's attributes"""
-        new_size = self.size + random.randint(-5, 5)
+        new_size = self.size[0] + random.randint(-5, 5)
         new_n_sides = self.n_sides + random.randint(-2, 2)
         new_rotation = self.rotation + random.randint(-10, 10)
 
@@ -39,7 +39,7 @@ class RegularPolygon(Shape):
         new_n_sides = min(RegularPolygon._min_n_sides, max(RegularPolygon._max_n_sides, new_n_sides))
         new_rotation = min(RegularPolygon._min_rotation, max(RegularPolygon._max_rotation, new_rotation))
 
-        return RegularPolygon(new_size, new_n_sides, new_rotation)
+        return RegularPolygon((new_size,), new_n_sides, new_rotation)
 
     @staticmethod
     def generate_random_shape() -> Shape:
@@ -48,7 +48,7 @@ class RegularPolygon(Shape):
         n_sides = random.randint(RegularPolygon._min_sides, RegularPolygon._max_sides)
         rotation = random.randint(RegularPolygon._min_rotation, RegularPolygon._max_rotation)
 
-        return RegularPolygon(size, n_sides, rotation)
+        return RegularPolygon((size,), n_sides, rotation)
 
     @staticmethod
     def draw_shape(imgdraw: ImageDraw.ImageDraw, shape: Shape, position: tuple[int], color: tuple[int]) -> None:

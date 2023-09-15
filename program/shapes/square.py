@@ -2,7 +2,8 @@ import logging
 import random
 
 from PIL import ImageDraw
-from shape import Shape, RegularPolygon
+from shapes.shape import Shape
+from shapes.regular_polygon import RegularPolygon
 
 
 class Square(RegularPolygon):
@@ -24,13 +25,13 @@ class Square(RegularPolygon):
 
     def evolve_shape(self) -> Shape:
         """Return a new Shape based on this shape with slight variations in it's attributes"""
-        new_size = self.size + random.randint(-5, 5)
+        new_size = self.size[0] + random.randint(-5, 5)
         new_rotation = self.rotation + random.randint(-10, 10)
 
         new_size = min(Square._min_size, max(Square._max_size, new_size))
         new_rotation = min(Square._min_rotation, max(Square._max_rotation, new_rotation))
 
-        return Square(new_size, new_rotation)
+        return Square((new_size,), new_rotation)
 
     @staticmethod
     def generate_random_shape() -> Shape:
@@ -38,7 +39,7 @@ class Square(RegularPolygon):
         size = random.randint(Square._min_size, Square._max_size)
         rotation = random.randint(Square._min_rotation, Square._max_rotation)
 
-        return Square(size, rotation)
+        return Square((size,), rotation)
 
     @staticmethod
     def draw_shape(imgdraw: ImageDraw.ImageDraw, shape: Shape, position: tuple[int], color: tuple[int]) -> None:
