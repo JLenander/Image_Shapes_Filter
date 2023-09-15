@@ -21,7 +21,7 @@ class Square(RegularPolygon):
         """Create a Square with size <size> and rotation <rotation>"""
         self.size = size
         self.rotation = rotation
-        self.n_sides = 2
+        self.n_sides = 4
 
     def evolve_shape(self) -> Shape:
         """Return a new Shape based on this shape with slight variations in it's attributes"""
